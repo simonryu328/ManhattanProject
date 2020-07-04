@@ -170,7 +170,7 @@ void loop() {
     distance_reading = DISTANCE_MAX;
 
   } else if (state == STATE_SERVO_TEST) {
-
+    // servo test
     servo.detach();
     servo.attach(SERVOPIN);
     
@@ -200,7 +200,7 @@ void loop() {
     servo.write(90);
     lcd_print_number(90);
     delay(2000);
-    
+
   } else if (state == STATE_NULL) {
     motor_stop();
     lcd_print_str_number("STATE NULL", distance_reading);
