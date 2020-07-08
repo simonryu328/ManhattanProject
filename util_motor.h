@@ -3,9 +3,10 @@
 
 #include <Arduino.h>
 
-#define ROTATE_SPEED_MIN 200
+#define PWM_FREQUENCY 1000
+#define ROTATE_SPEED_MIN 350
 #define RUN_FORWARD_SPEED 200
-#define MOTOR_OFFSET 40
+#define MOTOR_OFFSET 35
 
 // define functions
 void motor_run(uint32_t speed);
