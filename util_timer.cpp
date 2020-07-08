@@ -14,7 +14,9 @@ volatile uint32_t state = STATE_INIT;
 volatile uint32_t distance_target = DISTANCE_MAX;
 volatile uint32_t rotate_speed;
 volatile uint32_t tune_flag = 0;
+volatile uint32_t full_search_count = 0;
 volatile uint32_t read_count = 0;
+volatile uint32_t sonic_measure_count_tune_done = 0;
 
 void timer1_ISR(HardwareTimer * Timerx) {
 #if 1
@@ -22,7 +24,7 @@ void timer1_ISR(HardwareTimer * Timerx) {
   rotate_count++;
 
   if ((distance_reading_instant < DISTANCE_MIN) && (read_count > NUM_READING)) {
-    state = STATE_STOP;
+    state = STATE_NULL;
   }
 
   tape_reading = digitalRead(TAPESENSOR);

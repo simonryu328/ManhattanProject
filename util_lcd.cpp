@@ -61,3 +61,40 @@ void lcd_print_array(int id, volatile uint32_t *sample)
   lcd_print(sample_value_str);
 
 }
+
+void lcd_print_str_numarray(String s, uint32_t *sample) 
+{
+  display.clearDisplay();
+
+  // Displays string s on the screen
+  display.setCursor(0,0);
+  display.println(s);
+
+  // Displays number n in the next line on the screen
+  char sample_value_str[256];
+  sprintf(sample_value_str, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
+      int(sample[0]), int(sample[1]), int(sample[2]), int(sample[3]), int(sample[4]), int(sample[5]) ,int(sample[6]), int(sample[7]), 
+      int(sample[8]), int(sample[9]), int(sample[10]), int(sample[11]), int(sample[12]), int(sample[13]), int(sample[14]), int(sample[15]));
+  display.setCursor(0,10);
+  display.println(sample_value_str);
+  display.display();
+}
+
+void lcd_print_str_num4(String s, uint32_t num0, uint32_t num1, uint32_t num2, uint32_t num3)
+{
+  display.clearDisplay();
+  // Displays string s on the screen
+  display.setCursor(0,0);
+  display.println(s);
+  // Displays number n0, 1 in the next line on the screen
+  char sample_value_str[256];
+  sprintf(sample_value_str, "%d %d", int(num0), int(num1));
+  display.setCursor(0,10);
+  display.println(sample_value_str);
+  // Displays number n2, 3 in the next line on the screen
+  sprintf(sample_value_str, "%d %d", int(num2), int(num3));
+  display.setCursor(0,20);
+  display.println(sample_value_str);
+
+  display.display();
+}
