@@ -49,6 +49,7 @@ void timer1_resume();
 void timer1_pause();
 void timer2_resume();
 void timer2_pause();
+void timerSetup();
 
 extern volatile uint32_t count;
 extern volatile uint32_t rotate_count;

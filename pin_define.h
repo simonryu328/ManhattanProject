@@ -1,7 +1,7 @@
 #ifndef PIN_DEFINE_H_
 #define PIN_DEFINE_H_
 
-#define SERVOPIN PB10
+#define SERVOPIN PA6
 #define SERVOPIN_L PB11
 #define TRIGGERPIN PA0
 #define ECHOPIN PA1
