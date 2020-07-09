@@ -18,13 +18,20 @@ volatile uint32_t full_search_count = 0;
 volatile uint32_t read_count = 0;
 volatile uint32_t sonic_measure_count_tune_done = 0;
 
+
+// timer1 stops the motor if sonic sees distance less than DISTANCE_MIN 
+// if tape is detected go to state = STATE_TAPE_DET (except when its rotating)
 void timer1_ISR(HardwareTimer * Timerx) {
 #if 1
   count++;
   rotate_count++;
 
   if ((distance_reading_instant < DISTANCE_MIN) && (read_count > NUM_READING)) {
-    state = STATE_NULL;
+    // state = STATE_NULL for debugging purposes.
+    // Later implementation will have state should go to STATE_STOP, then use servos to
+    // pick up and deposit can, and go back to STATE_INIT to repeat entire searching process.
+    //state = STATE_NULL;
+    state = STATE_SERVO_TEST;
   }
 
   tape_reading = digitalRead(TAPESENSOR);
@@ -40,6 +47,7 @@ void timer1_ISR(HardwareTimer * Timerx) {
 #endif
 }
 
+// not using this.
 uint32_t timer2_count = 0;
 void timer2_ISR(HardwareTimer * Timerx) {
 #if 0
@@ -100,6 +108,7 @@ void timer2_resume()
   Timer2->resume();
 }
 
+// averages the array of readings to find distance_reading
 uint32_t average_distance(volatile uint32_t *arr)
 {
   uint32_t sum = 0;
@@ -108,4 +117,40 @@ uint32_t average_distance(volatile uint32_t *arr)
   }
 
   return (uint32_t)((double)sum/(double)NUM_READING);
+}
+
+void timerSetup() {
+  HardwareTimer *Timerx = new HardwareTimer(TIM1);
+  Timerx->pause();
+  Timerx->setOverflow(TIMER_PERIOD, MICROSEC_FORMAT);
+  Timerx->refresh();
+  Timerx->resume();
+
+  Timerx = new HardwareTimer(TIM2);
+  Timerx->pause();
+  Timerx->setOverflow(TIMER_PERIOD, MICROSEC_FORMAT);
+  Timerx->refresh();
+  Timerx->resume();
+
+  Timerx = new HardwareTimer(TIM3);
+  Timerx->pause();
+  Timerx->setOverflow(TIMER_PERIOD, MICROSEC_FORMAT);
+  Timerx->refresh();
+  Timerx->resume();
+
+  Timerx = new HardwareTimer(TIM4);
+  Timerx->pause();
+  Timerx->setOverflow(TIMER_PERIOD, MICROSEC_FORMAT);
+  Timerx->refresh();
+  Timerx->resume();
+  
+#if 0
+    for (int i = 1; i <= 4; i++) {
+        HardwareTimer timer(TIM1);
+        timer.pause();
+        timer.setOverflow(TIMER_PERIOD, MICROSEC_FORMAT);
+        timer.refresh();
+        timer.resume();
+    }
+#endif
 }

@@ -40,7 +40,7 @@ void loop() {
     if (read_count > 100) {
       state_debug_record();
       state = STATE_FULL_SEARCH_START;
-      // state = STATE_SERVO_TEST;
+      //state = STATE_SERVO_TEST;
     }
 
   } else if (state == STATE_FORWARD_RUN) {
@@ -190,21 +190,27 @@ void loop() {
 
   } else if (state == STATE_SERVO_TEST) {
     // servo test
+    //timerSetup();
+    motor_stop();
+    delay(200);
+
     servo.detach();
     servo.attach(SERVOPIN);
     
     servo.write(0);
     lcd_print_number(0);
     delay(2000);
-    
+
     servo.write(45);
     lcd_print_number(45);
     delay(2000);
-
+    
     servo.write(90);
     lcd_print_number(90);
     delay(2000);
+    servo.detach();
 
+  #if 0
     servo.detach();
     servo.attach(SERVOPIN_L);
     
@@ -219,6 +225,7 @@ void loop() {
     servo.write(90);
     lcd_print_number(90);
     delay(2000);
+  #endif
 
   } else if (state == STATE_NULL) {
     // for debugging
