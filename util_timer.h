@@ -5,7 +5,7 @@
 // define constants that are used by the timer. some other stuff are also here like full_search_count, distance
 #define TIMER_PERIOD 10
 #define DISTANCE_MAX 300
-#define DISTANCE_MIN 4
+#define DISTANCE_MIN 5
 #define NUM_READING 10
 #define DISTANCE_MARGIN 4 // 2cm distance margin
 #define DISTANCE_MARGIN_TUNE 2
@@ -16,9 +16,15 @@
 #define ROTATE_COUNT_30DEG 250
 #define ROTATE_COUNT_10DEG 100
 #define ROTATE_COUNT_5DEG 42
-#define ROTATE_COUNT_TUNE_RIGHT 200
-#define ROTATE_COUNT_TUNE_LEFT 80
-#define ROTATE_COUNT_TUNE_SMALL 80
+#define ROTATE_COUNT_TUNE_RIGHT 150
+#define ROTATE_COUNT_TUNE_LEFT 60
+#define ROTATE_COUNT_TUNE_SMALL 75
+#define REVERSE_COUNT 300
+#define COUNT_DET_FAR 2
+#define COUNT_DET_CLOSE 4
+#define COUNT_DET_MID 3
+#define DISTANCE_CLOSE 30
+#define DISTANCE_FAR 60
 #define FULL_SEARCH_COUNT_MAX 10
 #define TIMER_FREQUENCY (1000000 / TIMER_PERIOD)
 
@@ -38,6 +44,9 @@ typedef enum {
   STATE_SERVO_TEST,
   STATE_FULL_SEARCH_START,
   STATE_FULL_SEARCH_STEP_DONE,
+  STATE_REVERSE_START,
+  STATE_REVERSING,
+  STATE_REVERSE_DONE,
   STATE_NULL // turns off motor, displays numbers for debugging
 } State_t;
 
@@ -65,5 +74,7 @@ extern volatile uint32_t distance_target;
 extern volatile uint32_t tune_flag;
 extern volatile uint32_t read_count;
 extern volatile uint32_t full_search_count;
+extern volatile uint32_t reverse_count;
+extern volatile uint32_t reverse_count_done;
 
 #endif

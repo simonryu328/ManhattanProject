@@ -6,8 +6,7 @@
 #include "util_motor.h"
 #include "pin_define.h"
 #include "util_serial.h"
-
-Servo servo;
+#include "util_servo.h"
 
 void setup() {
   lcd_init();
@@ -17,6 +16,10 @@ void setup() {
   pinMode(ECHOPIN, INPUT_PULLDOWN);
   pinMode(TAPESENSOR, INPUT_PULLDOWN);
 }
+
+uint32_t count_detected = 0;
+uint32_t count_detected_max = 0;
+
 // distance_target is DISTANCE_MAX in the beginning
 void loop() {
 #if 1
@@ -39,7 +42,7 @@ void loop() {
     //do 100 readings before moving robot
     if (read_count > 100) {
       state_debug_record();
-      state = STATE_FULL_SEARCH_START;
+      state = STATE_REVERSE_START;
       //state = STATE_SERVO_TEST;
     }
 
@@ -107,12 +110,28 @@ void loop() {
       lcd_print_str_num4("STATE TUNE STEP DONE", distance_reading, distance_target, tune_flag, distance_reading_instant);
       rotate_count = 0;
       if (distance_reading < distance_target + DISTANCE_MARGIN_TUNE) {
-
-        tune_flag = 0;
+        count_detected++;
+        //tune_flag = 0;
         distance_target = distance_reading;
         state_debug_record();
-        state = STATE_FORWARD_RUN;
-
+        if(distance_target < DISTANCE_CLOSE) {
+          count_detected_max = COUNT_DET_CLOSE;
+        } else if (distance_target > DISTANCE_FAR) {
+          count_detected_max = COUNT_DET_FAR;
+        } else {
+          count_detected_max = COUNT_DET_MID;
+        }
+        if(count_detected > count_detected_max) {
+          count_detected = 0;
+          tune_flag = 0;
+          state = STATE_FORWARD_RUN;
+        } else {
+          rotate_count = 0;
+          rotate_count_done = ROTATE_COUNT_TUNE_LEFT;
+          rotate_speed = ROTATE_SPEED_MIN;
+          state = STATE_ROTATE_START_LEFT;
+          tune_flag++;
+        }
       } else {
         #if 1
         rotate_count = 0;
@@ -189,44 +208,28 @@ void loop() {
     }
 
   } else if (state == STATE_SERVO_TEST) {
-    // servo test
-    //timerSetup();
+    
+    lcd_print_str_number("STATE_SERVO_TEST", 1);
     motor_stop();
-    delay(200);
+    delay(3000);
+    lcd_print_str_number("STATE_SERVO_OPEN", 1);
+    servo_rotate_open(SERVOPIN, 90, 170, 30);
+    delay(3000);
+    lcd_print_str_number("STATE_SERVO_CLOSE", 1);
+    servo_rotate_close(SERVOPIN, 170, 90, 30);
+    delay(3000);
 
-    servo.detach();
-    servo.attach(SERVOPIN);
-    
-    servo.write(0);
-    lcd_print_number(0);
-    delay(2000);
-
-    servo.write(45);
-    lcd_print_number(45);
-    delay(2000);
-    
-    servo.write(90);
-    lcd_print_number(90);
-    delay(2000);
-    servo.detach();
-
-  #if 0
-    servo.detach();
-    servo.attach(SERVOPIN_L);
-    
-    servo.write(0);
-    lcd_print_number(0);
-    delay(2000);
-    
-    servo.write(45);
-    lcd_print_number(45);
-    delay(2000);
-
-    servo.write(90);
-    lcd_print_number(90);
-    delay(2000);
-  #endif
-
+  } else if (state == STATE_REVERSE_START) {
+      motor_stop();
+      reverse_count = 0;
+      reverse_count_done = REVERSE_COUNT;
+      motor_reverse(RUN_REVERSE_SPEED);
+      state = STATE_REVERSING;
+  } else if (state == STATE_REVERSING) {
+      if (reverse_count > reverse_count_done) {
+        motor_stop();
+        state = STATE_FULL_SEARCH_START;
+      } 
   } else if (state == STATE_NULL) {
     // for debugging
     motor_stop();
@@ -241,7 +244,7 @@ void loop() {
 
     state_debug_print();
 
-  }
+  } 
   #endif
 }
 

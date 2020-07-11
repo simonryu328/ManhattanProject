@@ -17,14 +17,17 @@ volatile uint32_t tune_flag = 0;
 volatile uint32_t full_search_count = 0;
 volatile uint32_t read_count = 0;
 volatile uint32_t sonic_measure_count_tune_done = 0;
+volatile uint32_t reverse_count = 0;
+volatile uint32_t reverse_count_done = 0;
 
-
+// NOT using timer2
 // timer1 stops the motor if sonic sees distance less than DISTANCE_MIN 
 // if tape is detected go to state = STATE_TAPE_DET (except when its rotating)
 void timer1_ISR(HardwareTimer * Timerx) {
 #if 1
   count++;
   rotate_count++;
+  reverse_count++;
 
   if ((distance_reading_instant < DISTANCE_MIN) && (read_count > NUM_READING)) {
     // state = STATE_NULL for debugging purposes.
@@ -34,6 +37,7 @@ void timer1_ISR(HardwareTimer * Timerx) {
     state = STATE_SERVO_TEST;
   }
 
+#if 1
   tape_reading = digitalRead(TAPESENSOR);
   if ((state != STATE_TAPE_DET) && 
     (state != STATE_ROTATE_START_RIGHT) && 
@@ -44,6 +48,8 @@ void timer1_ISR(HardwareTimer * Timerx) {
   } else {
 
   }
+#endif
+
 #endif
 }
 
