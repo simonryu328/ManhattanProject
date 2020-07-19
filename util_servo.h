@@ -9,4 +9,6 @@ void servo_rotate_open(uint32_t pin, uint32_t init_angle, uint32_t final_angle, 
 void servo_rotate_close(uint32_t pin, uint32_t init_angle, uint32_t final_angle, uint32_t delay_factor);
 // = servo.write
 void servo_write(uint32_t pin, uint32_t angle);
+// sweep and scoop
+void servo_sweep_scoop();
 #endif

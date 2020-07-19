@@ -29,12 +29,14 @@ void timer1_ISR(HardwareTimer * Timerx) {
   rotate_count++;
   reverse_count++;
 
-  if ((distance_reading_instant < DISTANCE_MIN) && (read_count > NUM_READING)) {
-    // state = STATE_NULL for debugging purposes.
-    // Later implementation will have state should go to STATE_STOP, then use servos to
-    // pick up and deposit can, and go back to STATE_INIT to repeat entire searching process.
-    //state = STATE_NULL;
-    state = STATE_SERVO_TEST;
+  if(state != STATE_NULL && state != STATE_SERVO) {
+    if ((distance_reading_instant < DISTANCE_MIN) && (read_count > NUM_READING)) {
+      // state = STATE_NULL for debugging purposes.
+      // Later implementation will have state should go to STATE_STOP, then use servos to
+      // pick up and deposit can, and go back to STATE_INIT to repeat entire searching process.
+      //state = STATE_NULL;
+      state = STATE_SERVO;
+    }
   }
 
 #if 1

@@ -109,7 +109,7 @@ void loop() {
     if(sonic_measure_count_tune_done > NUM_READING) {
       lcd_print_str_num4("STATE TUNE STEP DONE", distance_reading, distance_target, tune_flag, distance_reading_instant);
       rotate_count = 0;
-      if (distance_reading < distance_target + DISTANCE_MARGIN_TUNE) {
+      if (distance_reading <= distance_target + DISTANCE_MARGIN_TUNE) {
         count_detected++;
         //tune_flag = 0;
         distance_target = distance_reading;
@@ -170,7 +170,8 @@ void loop() {
     // robot has found a can. It should now use two servos to sweep the can and rotate the platform.
     lcd_print_str_number("STATE STOP", distance_reading);
     motor_stop();
-    state = STATE_SERVO_TEST;
+    state_debug_record();
+    state = STATE_SERVO;
     // distance_target = DISTANCE_MAX;
 
   } else if (state == STATE_FULL_SEARCH_START) {
@@ -199,35 +200,34 @@ void loop() {
         if(distance_reading < distance_target) {
           distance_target = distance_reading;
         }
+        state_debug_record();
         state = STATE_FULL_SEARCH_START;
        } else {
+         state_debug_record();
          state = STATE_ROTATE_TUNE_DONE;
          full_search_count = 0;
        }
       sonic_measure_count_tune_done = 0;
     }
 
-  } else if (state == STATE_SERVO_TEST) {
-    
-    lcd_print_str_number("STATE_SERVO_TEST", 1);
+  } else if (state == STATE_SERVO) {
+
     motor_stop();
-    delay(3000);
-    lcd_print_str_number("STATE_SERVO_OPEN", 1);
-    servo_rotate_open(SERVOPIN, 90, 170, 30);
-    delay(3000);
-    lcd_print_str_number("STATE_SERVO_CLOSE", 1);
-    servo_rotate_close(SERVOPIN, 170, 90, 30);
-    delay(3000);
+    servo_sweep_scoop();
+    state_debug_record();
+    state = STATE_NULL;
 
   } else if (state == STATE_REVERSE_START) {
       motor_stop();
       reverse_count = 0;
       reverse_count_done = REVERSE_COUNT;
       motor_reverse(RUN_REVERSE_SPEED);
+      state_debug_record();
       state = STATE_REVERSING;
   } else if (state == STATE_REVERSING) {
       if (reverse_count > reverse_count_done) {
         motor_stop();
+        state_debug_record();
         state = STATE_FULL_SEARCH_START;
       } 
   } else if (state == STATE_NULL) {

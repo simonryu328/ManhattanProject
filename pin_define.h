@@ -1,8 +1,8 @@
 #ifndef PIN_DEFINE_H_
 #define PIN_DEFINE_H_
 
-#define SERVOPIN PA6
-#define SERVOPIN_L PB11
+#define SERVOPIN PA11
+#define SERVOPIN_L PA15
 #define TRIGGERPIN PA0
 #define ECHOPIN PA1
 #define MOTOR_A_FORWARD PA_3
