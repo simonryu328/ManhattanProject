@@ -6,7 +6,7 @@
 #define TIMER_PERIOD 10
 #define DISTANCE_MAX 300
 #define DISTANCE_MIN 5
-#define NUM_READING 10
+#define NUM_READING 2
 #define DISTANCE_MARGIN 4 // 2cm distance margin
 #define DISTANCE_MARGIN_TUNE 3
 #define ROTATE_COUNT_90DEG 800
@@ -20,13 +20,15 @@
 #define ROTATE_COUNT_TUNE_LEFT 90
 #define ROTATE_COUNT_TUNE_SMALL 90
 #define REVERSE_COUNT 300
-#define COUNT_DET_FAR 2
+#define COUNT_DET_FAR 0
 #define COUNT_DET_CLOSE 4
-#define COUNT_DET_MID 3
+#define COUNT_DET_MID 2
 #define DISTANCE_CLOSE 30
 #define DISTANCE_FAR 60
-#define FULL_SEARCH_COUNT_MAX 10
+#define FULL_SEARCH_COUNT_MAX_INIT 10
+#define FULL_SEARCH_COUNT_MAX_NEXT 10
 #define TIMER_FREQUENCY (1000000 / TIMER_PERIOD)
+#define DISTANCE_READ_TO_NULL 1300
 
 typedef enum {
   STATE_INIT = 0,
@@ -74,6 +76,7 @@ extern volatile uint32_t distance_target;
 extern volatile uint32_t tune_flag;
 extern volatile uint32_t read_count;
 extern volatile uint32_t full_search_count;
+extern volatile uint32_t full_search_count_max;
 extern volatile uint32_t reverse_count;
 extern volatile uint32_t reverse_count_done;
 

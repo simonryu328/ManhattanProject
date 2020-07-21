@@ -17,6 +17,7 @@ void setup() {
   pinMode(TAPESENSOR, INPUT_PULLDOWN);
 }
 
+
 uint32_t count_detected = 0;
 uint32_t count_detected_max = 0;
 
@@ -25,9 +26,9 @@ void loop() {
 #if 1
   // distance_reading_instance: array containing the current distance reading and previous 9 readings
   // distance_reading: average of the array
-  // read_count: needs to do 100 readings before any state is initiated
-  // read distance only in STATE_FORWARD_RUN, ROTATE TUNE DONE, STATE_INIT AND FULL SEARCH STEP DONE
-  if (state == STATE_FORWARD_RUN || state == STATE_ROTATE_TUNE_DONE || state == STATE_FULL_SEARCH_STEP_DONE || state == STATE_INIT) {
+  // read_count: needs to do 100 readings in STATE_INIT before any state is initiated
+  // read distance only in STATE_FORWARD_RUN, ROTATE TUNE DONE, STATE_INIT AND FULL SEARCH STEP DONE, ROTATING
+  if (state == STATE_FORWARD_RUN || state == STATE_ROTATE_TUNE_DONE || state == STATE_FULL_SEARCH_STEP_DONE || state == STATE_INIT || state == STATE_ROTATING) {
     distance_reading_instance[read_count % NUM_READING] = get_distance();
     distance_reading_instant = distance_reading_instance[read_count % NUM_READING];
     distance_reading = average_distance(distance_reading_instance);
@@ -42,15 +43,16 @@ void loop() {
     //do 100 readings before moving robot
     if (read_count > 100) {
       state_debug_record();
+      state_debug_print_instance();
       state = STATE_REVERSE_START;
-      //state = STATE_SERVO_TEST;
+      //state = STATE_SERVO;
     }
-
   } else if (state == STATE_FORWARD_RUN) {
     lcd_print_str_num4("STATE RUN", distance_reading, distance_target, 0, distance_reading_instant);
     motor_run(RUN_FORWARD_SPEED);
     if(distance_reading > distance_target + DISTANCE_MARGIN) {
       state_debug_record();
+      state_debug_print_instance();
       state = STATE_TUNE_START;
       //state = STATE_NULL;
     } else {
@@ -67,6 +69,7 @@ void loop() {
     rotate_count_done = ROTATE_COUNT_90DEG;
     rotate_speed = ROTATE_SPEED_MIN;
     state_debug_record();
+    state_debug_print_instance();
     state = STATE_ROTATE_START_RIGHT;
     lcd_print_str_number("STATE TAPE DET", distance_reading);
 
@@ -74,12 +77,14 @@ void loop() {
 
     motor_rotate_right(rotate_speed);
     state_debug_record();
+    state_debug_print_instance();
     state = STATE_ROTATING;
 
   } else if (state == STATE_ROTATE_START_LEFT) {
 
     motor_rotate_left(rotate_speed);
     state_debug_record();
+    state_debug_print_instance();
     state = STATE_ROTATING;
 
   } else if (state == STATE_ROTATING) {
@@ -87,13 +92,10 @@ void loop() {
     lcd_print_str_number("STATE ROTATING", distance_reading);
     if (rotate_count > rotate_count_done) {
       if (tune_flag) {
-        state_debug_record();
         state = STATE_ROTATE_TUNE_DONE;
       } else if (full_search_count) { 
-        state_debug_record();
         state = STATE_FULL_SEARCH_STEP_DONE;
         } else {
-        state_debug_record();
         state = STATE_ROTATE_DONE;
       }
     }
@@ -114,6 +116,7 @@ void loop() {
         //tune_flag = 0;
         distance_target = distance_reading;
         state_debug_record();
+        state_debug_print_instance();
         if(distance_target < DISTANCE_CLOSE) {
           count_detected_max = COUNT_DET_CLOSE;
         } else if (distance_target > DISTANCE_FAR) {
@@ -124,11 +127,17 @@ void loop() {
         if(count_detected > count_detected_max) {
           count_detected = 0;
           tune_flag = 0;
+          state_debug_record();
+          state_debug_print_instance();
+          state_debug_print_i("adjust finish", count_detected, count_detected_max, distance_reading, distance_target);
           state = STATE_FORWARD_RUN;
         } else {
           rotate_count = 0;
           rotate_count_done = ROTATE_COUNT_TUNE_LEFT;
           rotate_speed = ROTATE_SPEED_MIN;
+          state_debug_record();
+          state_debug_print_instance();
+          state_debug_print_i("adjusting", count_detected, count_detected_max, distance_reading, distance_target);
           state = STATE_ROTATE_START_LEFT;
           tune_flag++;
         }
@@ -138,6 +147,8 @@ void loop() {
         rotate_count_done = ROTATE_COUNT_TUNE_LEFT;
         rotate_speed = ROTATE_SPEED_MIN;
         state_debug_record();
+        state_debug_print_instance();
+        state_debug_print_i("tuning", count_detected, count_detected_max, distance_reading, distance_target);
         #endif
         state = STATE_ROTATE_START_LEFT;
         tune_flag++;
@@ -152,6 +163,7 @@ void loop() {
     motor_stop();
     distance_target = DISTANCE_MAX;
     state_debug_record();
+    state_debug_print_instance();
     state = STATE_FULL_SEARCH_START;
 
   } else if (state == STATE_TUNE_START) {
@@ -163,6 +175,7 @@ void loop() {
     rotate_count_done = ROTATE_COUNT_TUNE_RIGHT;
     rotate_speed = ROTATE_SPEED_MIN;
     state_debug_record();
+    state_debug_print_instance();
     state = STATE_ROTATE_START_RIGHT;
     tune_flag = 1;
 
@@ -171,11 +184,12 @@ void loop() {
     lcd_print_str_number("STATE STOP", distance_reading);
     motor_stop();
     state_debug_record();
+    state_debug_print_instance();
     state = STATE_SERVO;
     // distance_target = DISTANCE_MAX;
 
   } else if (state == STATE_FULL_SEARCH_START) {
-    // robot rotates right in FULL_SEARCH_COUNT_MAX (set in 10) steps, and finds the minimum distance
+    // robot rotates right in FULL_SEARCH_COUNT_MAX steps, and finds the minimum distance
     // from all readings and set that as distance_target. Then the robot will rotate left in 
     // small steps (FINE_TUNE), finding distance_target again. See STATE_FULL_SEARCH_STEP_DONE for this.
     motor_stop();
@@ -185,6 +199,7 @@ void loop() {
     rotate_count_done = ROTATE_COUNT_TUNE_SMALL;
     rotate_speed = ROTATE_SPEED_MIN;
     state_debug_record();
+    state_debug_print_instance();
     state = STATE_ROTATE_START_RIGHT;
 
   } else if (state == STATE_FULL_SEARCH_STEP_DONE) {
@@ -196,14 +211,16 @@ void loop() {
 
      if(sonic_measure_count_tune_done > NUM_READING) {
        lcd_print_str_num4("STATE SEARCH STEP DONE", distance_reading, distance_target, full_search_count, distance_reading_instant);
-       if(full_search_count < FULL_SEARCH_COUNT_MAX) {
+       if(full_search_count < full_search_count_max) {
         if(distance_reading < distance_target) {
           distance_target = distance_reading;
         }
         state_debug_record();
+        state_debug_print_instance();
         state = STATE_FULL_SEARCH_START;
        } else {
          state_debug_record();
+         state_debug_print_instance();
          state = STATE_ROTATE_TUNE_DONE;
          full_search_count = 0;
        }
@@ -212,10 +229,19 @@ void loop() {
 
   } else if (state == STATE_SERVO) {
 
+    distance_reading_instant = DISTANCE_MAX;
+    distance_reading = DISTANCE_MAX;
+    distance_target = DISTANCE_MAX;
     motor_stop();
     servo_sweep_scoop();
     state_debug_record();
-    state = STATE_NULL;
+    state_debug_print_instance();
+    full_search_count = 0;
+    tune_flag = 0;
+    full_search_count_max = FULL_SEARCH_COUNT_MAX_NEXT;
+    //state = STATE_FULL_SEARCH_START;
+    //state = STATE_NULL;
+    state = STATE_FULL_SEARCH_START;
 
   } else if (state == STATE_REVERSE_START) {
       motor_stop();
@@ -223,11 +249,14 @@ void loop() {
       reverse_count_done = REVERSE_COUNT;
       motor_reverse(RUN_REVERSE_SPEED);
       state_debug_record();
+      state_debug_print_instance();
       state = STATE_REVERSING;
   } else if (state == STATE_REVERSING) {
       if (reverse_count > reverse_count_done) {
         motor_stop();
         state_debug_record();
+        state_debug_print_instance();
+        full_search_count_max = FULL_SEARCH_COUNT_MAX_INIT;
         state = STATE_FULL_SEARCH_START;
       } 
   } else if (state == STATE_NULL) {
@@ -243,8 +272,12 @@ void loop() {
     delay(1000);
 
     state_debug_print();
-
-  } 
+    state_debug_print_instance();
+  } else {
+    state_debug_record();
+    state_debug_print_instance();
+    state = STATE_NULL;
+  }
   #endif
 }
 

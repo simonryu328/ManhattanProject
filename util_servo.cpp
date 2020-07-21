@@ -41,5 +41,5 @@ void servo_sweep_scoop() {
     delay(1000);
     servo_rotate_open(SERVOPIN, 0, 150, 10);
     delay(1000);
-    servo_rotate_close(SERVOPIN_L, 160, 30, 30);
+    servo_rotate_close(SERVOPIN_L, 160, 30, 10);
 }

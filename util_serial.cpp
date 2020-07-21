@@ -9,11 +9,13 @@ uint8_t distance_target_record[NUM_STATE_RECORD] = {0};
 
 void state_debug_record()
 {
-    state_count_record[stat_change_count] = stat_change_count;
-    state_record[stat_change_count] = (uint8_t)state;
-    distance_reading_record[stat_change_count] = (uint8_t)distance_reading;
-    distance_target_record[stat_change_count] = (uint8_t)distance_target;
+#if 0
+    state_count_record[stat_change_count % NUM_STATE_RECORD] = stat_change_count;
+    state_record[stat_change_count % NUM_STATE_RECORD] = (uint8_t)state;
+    distance_reading_record[stat_change_count % NUM_STATE_RECORD] = (uint8_t)distance_reading;
+    distance_target_record[stat_change_count % NUM_STATE_RECORD] = (uint8_t)distance_target;
     stat_change_count++;
+#endif
 }
 
 #if 0
@@ -54,7 +56,7 @@ String get_state_string(uint8_t state)
     else if (state == (uint8_t)STATE_TAPE_DET) return "STATE_TAPE_DET";
     else if (state == (uint8_t)STATE_FOUND) return "STATE_FOUND";
     else if (state == (uint8_t)STATE_TUNE_START) return "STATE_TUNE_START";
-    else if (state == (uint8_t)STATE_SERVO) return "STATE_SERVO_TEST";
+    else if (state == (uint8_t)STATE_SERVO) return "STATE_SERVO";
     else if (state == (uint8_t)STATE_FULL_SEARCH_START) return "STATE_FULL_SEARCH_START";
     else if (state == (uint8_t)STATE_FULL_SEARCH_STEP_DONE) return "STATE_FULL_SEARCH_STEP_DONE";
     else if (state == (uint8_t)STATE_REVERSE_START) return "STATE_REVERSE_START";
@@ -62,12 +64,17 @@ String get_state_string(uint8_t state)
     else if (state == (uint8_t)STATE_REVERSE_DONE) return "STATE_REVERSE_DONE";
     else if (state == (uint8_t)STATE_NULL) return "STATE_NULL";
 
-    return "ERROR";
+    char err_str[64];
+    sprintf(err_str, "%d is UNKNOWN STATE", state);
+    return err_str;
 }
 
 void state_debug_print()
 {
-    Serial.begin(115200);
+#if 0
+    Serial.begin(9600);
+
+    Serial.println("========== SERAIL PRINT START ==============");
 
     for (int i = 0; i < NUM_STATE_RECORD; i++) {
         Serial.print("index: ");
@@ -80,6 +87,46 @@ void state_debug_print()
         Serial.println(distance_target_record[i]);
     }
 
+    Serial.println("+++++++++++++ SERAIL PRINT END ++++++++++++++++++");
+
     Serial.end();
+#endif
 }
 
+void state_debug_print_instance()
+{
+#if 0
+    Serial.begin(9600);
+
+    Serial.print(" state = ");
+    Serial.print(get_state_string(state));
+    Serial.print(" distance_reading: ");
+    Serial.print(distance_reading);
+    Serial.print(" distance_target: ");
+    Serial.print(distance_target);
+    Serial.print(" rotate_count: ");
+    Serial.print(rotate_count);
+    Serial.print(" tune_flag: ");
+    Serial.print(tune_flag);
+    Serial.print(" full_search_count: ");
+    Serial.println(full_search_count);
+
+    Serial.end();
+#endif
+}
+
+void state_debug_print_i(String s, uint32_t a, uint32_t b, uint32_t c, uint32_t d){
+    Serial.begin(9600);
+
+    Serial.print(s);
+    Serial.print(" ");
+    Serial.print(a);
+    Serial.print(" ");
+    Serial.print(b);
+    Serial.print(" ");
+    Serial.print(c);
+    Serial.print(" ");
+    Serial.println(d);
+
+    Serial.end();
+}
