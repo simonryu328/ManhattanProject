@@ -11,22 +11,23 @@
 #define DISTANCE_MARGIN_TUNE 3
 #define ROTATE_COUNT_90DEG 800
 #define ROTATE_COUNT_120DEG 1000
-#define ROTATE_COUNT_180DEG 1600
+#define ROTATE_COUNT_180DEG 2000
 #define ROTATE_COUNT_60DEG 500
 #define ROTATE_COUNT_30DEG 250
 #define ROTATE_COUNT_10DEG 100
 #define ROTATE_COUNT_5DEG 42
 #define ROTATE_COUNT_TUNE_RIGHT 150
 #define ROTATE_COUNT_TUNE_LEFT 90
-#define ROTATE_COUNT_TUNE_SMALL 90
+#define ROTATE_COUNT_TUNE_SMALL 120
+#define ROTATE_COUNT_TUNE_MED 160
 #define REVERSE_COUNT 300
 #define COUNT_DET_FAR 0
 #define COUNT_DET_CLOSE 4
 #define COUNT_DET_MID 2
 #define DISTANCE_CLOSE 30
 #define DISTANCE_FAR 60
-#define FULL_SEARCH_COUNT_MAX_INIT 10
-#define FULL_SEARCH_COUNT_MAX_NEXT 10
+#define FULL_SEARCH_COUNT_MAX_INIT 15
+#define FULL_SEARCH_COUNT_MAX_NEXT 15
 #define TIMER_FREQUENCY (1000000 / TIMER_PERIOD)
 #define DISTANCE_READ_TO_NULL 1300
 
@@ -79,5 +80,6 @@ extern volatile uint32_t full_search_count;
 extern volatile uint32_t full_search_count_max;
 extern volatile uint32_t reverse_count;
 extern volatile uint32_t reverse_count_done;
+extern volatile uint32_t rotate_count_small;
 
 #endif

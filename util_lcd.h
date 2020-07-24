@@ -8,6 +8,7 @@
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET 	-1 // This display does not have a reset pin accessible
+//#define LCD_DISPLAY
 
 // define lcd functions to display different stuff
 void lcd_print_number(double n);
