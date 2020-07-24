@@ -66,10 +66,11 @@ void loop() {
     // if tape is detected the robot will rotate right by about 90 deg, then go to FULL_SEARCH_START
     motor_stop();
     rotate_count = 0;
-    rotate_count_done = ROTATE_COUNT_90DEG;
+    rotate_count_done = ROTATE_COUNT_180DEG;
     rotate_speed = ROTATE_SPEED_MIN;
     state_debug_record();
     state_debug_print_instance();
+    distance_target = DISTANCE_MAX;
     state = STATE_ROTATE_START_RIGHT;
     lcd_print_str_number("STATE TAPE DET", distance_reading);
 
@@ -133,7 +134,7 @@ void loop() {
           state = STATE_FORWARD_RUN;
         } else {
           rotate_count = 0;
-          rotate_count_done = ROTATE_COUNT_TUNE_LEFT;
+          rotate_count_done = rotate_count_small;
           rotate_speed = ROTATE_SPEED_MIN;
           state_debug_record();
           state_debug_print_instance();
@@ -144,7 +145,7 @@ void loop() {
       } else {
         #if 1
         rotate_count = 0;
-        rotate_count_done = ROTATE_COUNT_TUNE_LEFT;
+        rotate_count_done = rotate_count_small;
         rotate_speed = ROTATE_SPEED_MIN;
         state_debug_record();
         state_debug_print_instance();
@@ -196,7 +197,7 @@ void loop() {
     full_search_count++;
     sonic_measure_count_tune_done = 0;
     rotate_count = 0;
-    rotate_count_done = ROTATE_COUNT_TUNE_SMALL;
+    rotate_count_done = rotate_count_small;
     rotate_speed = ROTATE_SPEED_MIN;
     state_debug_record();
     state_debug_print_instance();
@@ -217,6 +218,7 @@ void loop() {
         }
         state_debug_record();
         state_debug_print_instance();
+        state_debug_print_i("FULL_SEARCH", count_detected, count_detected_max, distance_reading, distance_target);
         state = STATE_FULL_SEARCH_START;
        } else {
          state_debug_record();
@@ -241,6 +243,9 @@ void loop() {
     full_search_count_max = FULL_SEARCH_COUNT_MAX_NEXT;
     //state = STATE_FULL_SEARCH_START;
     //state = STATE_NULL;
+    motor_offset_right = MOTOR_OFFSET_SECOND;
+    motor_offset_left = -MOTOR_OFFSET_SECOND_LEFT;
+    rotate_count_small = ROTATE_COUNT_TUNE_MED;
     state = STATE_FULL_SEARCH_START;
 
   } else if (state == STATE_REVERSE_START) {

@@ -20,6 +20,7 @@ volatile uint32_t read_count = 0;
 volatile uint32_t sonic_measure_count_tune_done = 0;
 volatile uint32_t reverse_count = 0;
 volatile uint32_t reverse_count_done = 0;
+volatile uint32_t rotate_count_small = ROTATE_COUNT_TUNE_SMALL;
 
 // NOT using timer2
 // timer1 stops the motor if sonic sees distance less than DISTANCE_MIN 

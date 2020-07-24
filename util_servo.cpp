@@ -37,9 +37,9 @@ void servo_write(uint32_t pin, uint32_t angle) {
 void servo_sweep_scoop() {
     servo_rotate_open(SERVOPIN_L, 90, 160, 20);
     delay(1000);
-    servo_rotate_close(SERVOPIN, 150, 0, 10);
+    servo_rotate_close(SERVOPIN, 135, 0, 6);
     delay(1000);
-    servo_rotate_open(SERVOPIN, 0, 150, 10);
+    servo_rotate_open(SERVOPIN, 0, 135, 6);
     delay(1000);
     servo_rotate_close(SERVOPIN_L, 160, 30, 10);
 }
